@@ -2,6 +2,7 @@ package com.librotech.catalog.controller;
 
 import com.librotech.catalog.Service.BookServices;
 import com.librotech.catalog.dto.ApiResponse;
+import com.librotech.catalog.dto.BookDescriptionRequest;
 import com.librotech.catalog.dto.BookRequest;
 import com.librotech.catalog.dto.BookResponse;
 import jakarta.validation.Valid;
@@ -32,6 +33,13 @@ public class BookController {
         BookResponse bookCreated = bookServices.addBook(request);
         ApiResponse<BookResponse> response = ApiResponse.success(bookCreated, "Book created successfully");
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/search-by-description")
+    public ResponseEntity<ApiResponse<BookResponse>> getBookFromDescription(@RequestBody @Valid BookDescriptionRequest request) {
+        BookResponse book = bookServices.findBookByDescription(request.getDescription());
+        ApiResponse<BookResponse> response = ApiResponse.success(book, "Book found successfully");
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
