@@ -56,10 +56,23 @@ public class BookServices {
         return toBookResponse(book);
     }
 
-    public void deleteBook(Long id){
+    public void deleteBook(Long id) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Book not found"));
         bookRepository.delete(book);
+    }
+
+    public void updateBook(Long id, BookRequest bookRequest) {
+        bookRepository.findById(id)
+                .map(book -> {
+                            book.setTitle(bookRequest.getTitle());
+                            book.setAuthor(bookRequest.getAuthor());
+                            book.setIsbn(bookRequest.getIsbn());
+                            book.setPublicationYear(bookRequest.getPublicationYear());
+                            return bookRepository.save(book);
+                        }
+                )
+                .orElseThrow(() -> new RuntimeException("Book not found"));
     }
 
     private BookResponse toBookResponse(Book book) {

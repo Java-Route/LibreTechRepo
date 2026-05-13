@@ -1,7 +1,6 @@
 package com.librotech.catalog.controller;
 
 import com.librotech.catalog.Service.BookServices;
-import com.librotech.catalog.dto.ApiResponse;
 import com.librotech.catalog.dto.BookDescriptionRequest;
 import com.librotech.catalog.dto.BookRequest;
 import com.librotech.catalog.dto.BookResponse;
@@ -22,24 +21,21 @@ public class BookController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<BookResponse>>> getAllBooks(){
+    public ResponseEntity<List<BookResponse>> getAllBooks(){
         List<BookResponse> bookResponseList = bookServices.getAllBooks();
-        ApiResponse<List<BookResponse>> response = ApiResponse.success(bookResponseList, "List of books obtained");
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(bookResponseList);
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<BookResponse>> createBook(@RequestBody @Valid BookRequest request){
+    public ResponseEntity<BookResponse> createBook(@RequestBody @Valid BookRequest request){
         BookResponse bookCreated = bookServices.addBook(request);
-        ApiResponse<BookResponse> response = ApiResponse.success(bookCreated, "Book created successfully");
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(bookCreated);
     }
 
     @PostMapping("/search-by-description")
-    public ResponseEntity<ApiResponse<BookResponse>> getBookFromDescription(@RequestBody @Valid BookDescriptionRequest request) {
+    public ResponseEntity<BookResponse> getBookFromDescription(@RequestBody @Valid BookDescriptionRequest request) {
         BookResponse book = bookServices.findBookByDescription(request.getDescription());
-        ApiResponse<BookResponse> response = ApiResponse.success(book, "Book found successfully");
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(book);
     }
 
     @DeleteMapping("/{id}")
@@ -48,4 +44,9 @@ public class BookController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateBook(@PathVariable Long id, @RequestBody @Valid BookRequest bookRequest){
+        bookServices.updateBook(id, bookRequest);
+        return ResponseEntity.noContent().build();
+    }
 }
