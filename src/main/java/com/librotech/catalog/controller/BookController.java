@@ -8,6 +8,7 @@ import com.librotech.catalog.validation.OnCreate;
 import com.librotech.catalog.validation.OnPatch;
 import com.librotech.catalog.validation.OnUpdate;
 import jakarta.validation.Valid;
+import jakarta.websocket.server.PathParam;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -15,8 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/books")
@@ -29,13 +28,23 @@ public class BookController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<BookResponse>> getAllBooks(@PageableDefault(size = 10, sort = "title") Pageable pageable){
-        Page<BookResponse> bookResponseList = bookServices.getAllBooks(pageable);
-        return ResponseEntity.ok(bookResponseList);
+    public ResponseEntity<Page<BookResponse>> getBooks(
+            @RequestParam(required = false) String author,
+            @PageableDefault(size = 10, sort = "title") Pageable pageable
+    ) {
+        Page<BookResponse> bookResponses;
+
+        if (author != null && !author.isBlank()) {
+            bookResponses = bookServices.getBookByAuthor(pageable, author);
+        } else {
+            bookResponses = bookServices.getAllBooks(pageable);
+        }
+
+        return ResponseEntity.ok(bookResponses);
     }
 
     @PostMapping
-    public ResponseEntity<BookResponse> createBook(@RequestBody @Validated(OnCreate.class) BookRequest request){
+    public ResponseEntity<BookResponse> createBook(@RequestBody @Validated(OnCreate.class) BookRequest request) {
         BookResponse bookCreated = bookServices.addBook(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(bookCreated);
     }
@@ -47,19 +56,19 @@ public class BookController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBook(@PathVariable Long id){
+    public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
         bookServices.deleteBook(id);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateBook(@PathVariable Long id, @RequestBody @Validated(OnUpdate.class) BookRequest bookRequest){
+    public ResponseEntity<Void> updateBook(@PathVariable Long id, @RequestBody @Validated(OnUpdate.class) BookRequest bookRequest) {
         bookServices.updateBook(id, bookRequest);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Void> patchBook(@PathVariable Long id, @RequestBody @Validated(OnPatch.class) BookRequest bookRequest){
+    public ResponseEntity<Void> patchBook(@PathVariable Long id, @RequestBody @Validated(OnPatch.class) BookRequest bookRequest) {
         bookServices.patchBook(id, bookRequest);
         return ResponseEntity.noContent().build();
     }

@@ -4,6 +4,7 @@ import com.librotech.catalog.Repository.BookRepository;
 import com.librotech.catalog.dto.BookRequest;
 import com.librotech.catalog.dto.BookResponse;
 import com.librotech.catalog.model.Book;
+import dev.langchain4j.agent.tool.P;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,13 +23,12 @@ public class BookServices {
 
     public Page<BookResponse> getAllBooks(Pageable pageable) {
         return bookRepository.findAll(pageable)
-                .map(book -> new BookResponse(
-                        book.getId(),
-                        book.getTitle(),
-                        book.getAuthor(),
-                        book.getIsbn(),
-                        book.getPublicationYear()
-                ));
+                .map(this::toBookResponse);
+    }
+
+    public Page<BookResponse> getBookByAuthor(Pageable pageable, String author) {
+        return bookRepository.findByAuthorIgnoreCase(pageable, author)
+                .map(this::toBookResponse);
     }
 
     public BookResponse addBook(BookRequest request) {
@@ -40,13 +40,7 @@ public class BookServices {
 
         Book savedBook = bookRepository.save(book);
 
-        return new BookResponse(
-                savedBook.getId(),
-                savedBook.getTitle(),
-                savedBook.getAuthor(),
-                savedBook.getIsbn(),
-                savedBook.getPublicationYear()
-        );
+        return toBookResponse(savedBook);
     }
 
     public BookResponse findBookByDescription(String description) {
@@ -79,14 +73,16 @@ public class BookServices {
     public void patchBook(Long id, BookRequest bookRequest) {
         bookRepository.findById(id)
                 .map(book -> {
-                    if(bookRequest.getTitle() != null) book.setTitle(bookRequest.getTitle());
-                    if(bookRequest.getAuthor() != null) book.setAuthor(bookRequest.getAuthor());
-                    if(bookRequest.getIsbn() != null) book.setIsbn(bookRequest.getIsbn());
-                    if(bookRequest.getPublicationYear() != null) book.setPublicationYear(bookRequest.getPublicationYear());
+                    if (bookRequest.getTitle() != null) book.setTitle(bookRequest.getTitle());
+                    if (bookRequest.getAuthor() != null) book.setAuthor(bookRequest.getAuthor());
+                    if (bookRequest.getIsbn() != null) book.setIsbn(bookRequest.getIsbn());
+                    if (bookRequest.getPublicationYear() != null)
+                        book.setPublicationYear(bookRequest.getPublicationYear());
                     return bookRepository.save(book);
                 })
                 .orElseThrow(() -> new RuntimeException("Book not found"));
     }
+
 
     private BookResponse toBookResponse(Book book) {
         return new BookResponse(
