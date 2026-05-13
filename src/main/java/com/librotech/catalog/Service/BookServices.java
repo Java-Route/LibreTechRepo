@@ -75,6 +75,18 @@ public class BookServices {
                 .orElseThrow(() -> new RuntimeException("Book not found"));
     }
 
+    public void patchBook(Long id, BookRequest bookRequest) {
+        bookRepository.findById(id)
+                .map(book -> {
+                    if(bookRequest.getTitle() != null) book.setTitle(bookRequest.getTitle());
+                    if(bookRequest.getAuthor() != null) book.setAuthor(bookRequest.getAuthor());
+                    if(bookRequest.getIsbn() != null) book.setIsbn(bookRequest.getIsbn());
+                    if(bookRequest.getPublicationYear() != null) book.setPublicationYear(bookRequest.getPublicationYear());
+                    return bookRepository.save(book);
+                })
+                .orElseThrow(() -> new RuntimeException("Book not found"));
+    }
+
     private BookResponse toBookResponse(Book book) {
         return new BookResponse(
                 book.getId(),

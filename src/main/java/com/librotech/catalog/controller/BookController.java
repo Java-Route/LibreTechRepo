@@ -4,15 +4,20 @@ import com.librotech.catalog.Service.BookServices;
 import com.librotech.catalog.dto.BookDescriptionRequest;
 import com.librotech.catalog.dto.BookRequest;
 import com.librotech.catalog.dto.BookResponse;
+import com.librotech.catalog.validation.OnCreate;
+import com.librotech.catalog.validation.OnPatch;
+import com.librotech.catalog.validation.OnUpdate;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/books")
+@Validated
 public class BookController {
     private final BookServices bookServices;
 
@@ -27,7 +32,7 @@ public class BookController {
     }
 
     @PostMapping
-    public ResponseEntity<BookResponse> createBook(@RequestBody @Valid BookRequest request){
+    public ResponseEntity<BookResponse> createBook(@RequestBody @Validated(OnCreate.class) BookRequest request){
         BookResponse bookCreated = bookServices.addBook(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(bookCreated);
     }
@@ -45,8 +50,14 @@ public class BookController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateBook(@PathVariable Long id, @RequestBody @Valid BookRequest bookRequest){
+    public ResponseEntity<Void> updateBook(@PathVariable Long id, @RequestBody @Validated(OnUpdate.class) BookRequest bookRequest){
         bookServices.updateBook(id, bookRequest);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Void> patchBook(@PathVariable Long id, @RequestBody @Validated(OnPatch.class) BookRequest bookRequest){
+        bookServices.patchBook(id, bookRequest);
         return ResponseEntity.noContent().build();
     }
 }
