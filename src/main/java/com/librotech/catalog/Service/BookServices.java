@@ -4,6 +4,8 @@ import com.librotech.catalog.Repository.BookRepository;
 import com.librotech.catalog.dto.BookRequest;
 import com.librotech.catalog.dto.BookResponse;
 import com.librotech.catalog.model.Book;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,16 +20,15 @@ public class BookServices {
         this.bookTitleAiService = bookTitleAiService;
     }
 
-    public List<BookResponse> getAllBooks() {
-        return bookRepository.findAll()
-                .stream()
+    public Page<BookResponse> getAllBooks(Pageable pageable) {
+        return bookRepository.findAll(pageable)
                 .map(book -> new BookResponse(
                         book.getId(),
                         book.getTitle(),
                         book.getAuthor(),
                         book.getIsbn(),
                         book.getPublicationYear()
-                )).toList();
+                ));
     }
 
     public BookResponse addBook(BookRequest request) {

@@ -8,6 +8,9 @@ import com.librotech.catalog.validation.OnCreate;
 import com.librotech.catalog.validation.OnPatch;
 import com.librotech.catalog.validation.OnUpdate;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -26,8 +29,8 @@ public class BookController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BookResponse>> getAllBooks(){
-        List<BookResponse> bookResponseList = bookServices.getAllBooks();
+    public ResponseEntity<Page<BookResponse>> getAllBooks(@PageableDefault(size = 10, sort = "title") Pageable pageable){
+        Page<BookResponse> bookResponseList = bookServices.getAllBooks(pageable);
         return ResponseEntity.ok(bookResponseList);
     }
 
