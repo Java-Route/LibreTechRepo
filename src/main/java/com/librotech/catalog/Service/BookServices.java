@@ -4,7 +4,6 @@ import com.librotech.catalog.Repository.BookRepository;
 import com.librotech.catalog.dto.BookRequest;
 import com.librotech.catalog.dto.BookResponse;
 import com.librotech.catalog.model.Book;
-import dev.langchain4j.agent.tool.P;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -43,12 +42,18 @@ public class BookServices {
         return toBookResponse(savedBook);
     }
 
-    public BookResponse findBookByDescription(String description) {
-        String title = bookTitleAiService.findTitleFromDescription(description);
-        Book book = bookRepository.findFirstByTitleIgnoreCase(title)
-                .orElseThrow(() -> new RuntimeException("Book not found with title: " + title));
+    public List<BookResponse> findBooksByDescription(String description) {
+        List<Book> books = bookRepository.findAll();
+        List<Long> matchingIds = bookTitleAiService.findBookIdsFromDescription(description, books);
 
-        return toBookResponse(book);
+        return matchingIds.stream()
+                .map(id -> books.stream()
+                        .filter(book -> book.getId().equals(id))
+                        .findFirst()
+                        .orElse(null))
+                .filter(book -> book != null)
+                .map(this::toBookResponse)
+                .toList();
     }
 
     public void deleteBook(Long id) {

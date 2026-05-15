@@ -17,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/books")
 @Validated
@@ -50,9 +52,9 @@ public class BookController {
     }
 
     @PostMapping("/search-by-description")
-    public ResponseEntity<BookResponse> getBookFromDescription(@RequestBody @Valid BookDescriptionRequest request) {
-        BookResponse book = bookServices.findBookByDescription(request.getDescription());
-        return ResponseEntity.ok(book);
+    public ResponseEntity<List<BookResponse>> getBookFromDescription(@RequestBody @Valid BookDescriptionRequest request) {
+        List<BookResponse> books = bookServices.findBooksByDescription(request.getDescription());
+        return ResponseEntity.ok(books);
     }
 
     @DeleteMapping("/{id}")
