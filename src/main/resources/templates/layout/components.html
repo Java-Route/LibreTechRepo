@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<!-- Este archivo no se renderiza por sí solo, solo almacena fragmentos -->
+<body>
+
+<!-- Fragmento: Navbar -->
+<header th:fragment="navbar" style="background-color: #333; color: white; padding: 15px;">
+    <h2 style="margin: 0; display: inline-block;">📚 LibroTech Admin</h2>
+    <nav style="display: inline-block; margin-left: 20px;">
+        <a th:href="@{/admin/books}" style="color: white; margin-right: 15px;">Catálogo</a>
+        <a th:href="@{/api/books}" target="_blank" style="color: #aaa;">Ver API JSON</a>
+    </nav>
+</header>
+
+<!-- Fragmento: Footer -->
+<footer th:fragment="footer" style="text-align: center; padding: 20px; color: #777; margin-top: 40px; border-top: 1px solid #ddd;">
+    <p>&copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2024</span> LibroTech - Sistema de Gestión de Bibliotecas</p>
+</footer>
+
+</body>
+</html>

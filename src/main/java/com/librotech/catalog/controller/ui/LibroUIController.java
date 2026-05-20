@@ -1,6 +1,7 @@
 package com.librotech.catalog.controller.ui;
 
 import com.librotech.catalog.Service.BookServices;
+import com.librotech.catalog.dto.BookRequest;
 import com.librotech.catalog.dto.BookResponse;
 import com.librotech.catalog.model.Book;
 import org.springframework.data.domain.Page;
@@ -9,8 +10,11 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -34,5 +38,35 @@ public class LibroUIController {
 
         // Retornamos el nombre del archivo HTML (sin la extensión .html)
         return "books/list";
+    }
+
+    // ... código anterior ...
+
+    @GetMapping("/new")
+    public String mostrarFormularioCreacion(Model model) {
+        // Pasamos una instancia vacía que el formulario llenará
+        model.addAttribute("book", new Book());
+        model.addAttribute("screenTitle", "Registrar Nuevo Libro");
+
+        return "books/form";
+    }
+
+    @PostMapping("/save")
+    public String guardarLibro(@ModelAttribute("book") BookRequest bookRequest, Model model) {
+
+        int currentYear = LocalDate.now().getYear();
+        if (bookRequest.getPublicationYear() > currentYear) {
+            model.addAttribute("yearError", "El año de publicación no puede ser mayor al año actual ("+currentYear +")");
+            model.addAttribute("screenTitle", "Registrar Nuevo Libro (Corrección)");
+
+            // Retornamos la vista del formulario (NO usamos redirect, para mantener los datos tipeados)
+            return "books/form";
+        }
+        // Guardamos el libro usando el servicio
+        bookServices.addBook(bookRequest);
+
+        // Patrón PRG: Redirigimos a la lista de libros (GET)
+        // La palabra clave "redirect:" le dice a Spring que emita un HTTP 302
+        return "redirect:/admin/books";
     }
 }
