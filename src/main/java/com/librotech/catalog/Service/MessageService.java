@@ -2,7 +2,11 @@ package com.librotech.catalog.Service;
 
 import com.librotech.catalog.Repository.MessageRepository;
 import com.librotech.catalog.model.Message;
+import org.springframework.stereotype.Service;
 
+import java.util.List;
+
+@Service
 public class MessageService {
     private final MessageRepository messageRepository;
 
@@ -10,7 +14,11 @@ public class MessageService {
         this.messageRepository = messageRepository;
     }
 
-    public void saveMessage(Message message){
-        messageRepository.insert(message);
+    public Message saveMessage(Message message) {
+        return messageRepository.save(message);
+    }
+
+    public List<Message> getAllMessages() {
+        return messageRepository.findAll();
     }
 }
