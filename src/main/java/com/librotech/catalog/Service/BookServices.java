@@ -35,7 +35,7 @@ public class BookServices {
         book.setTitle(request.getTitle());
         book.setAuthor(request.getAuthor());
         book.setIsbn(request.getIsbn());
-        book.setPublicationYear(request.getPublicationYear());
+        book.setPublicationDate(request.getPublicationDate());
 
         Book savedBook = bookRepository.save(book);
 
@@ -68,7 +68,7 @@ public class BookServices {
                             book.setTitle(bookRequest.getTitle());
                             book.setAuthor(bookRequest.getAuthor());
                             book.setIsbn(bookRequest.getIsbn());
-                            book.setPublicationYear(bookRequest.getPublicationYear());
+                            book.setPublicationDate(bookRequest.getPublicationDate());
                             return bookRepository.save(book);
                         }
                 )
@@ -81,11 +81,22 @@ public class BookServices {
                     if (bookRequest.getTitle() != null) book.setTitle(bookRequest.getTitle());
                     if (bookRequest.getAuthor() != null) book.setAuthor(bookRequest.getAuthor());
                     if (bookRequest.getIsbn() != null) book.setIsbn(bookRequest.getIsbn());
-                    if (bookRequest.getPublicationYear() != null)
-                        book.setPublicationYear(bookRequest.getPublicationYear());
+                    if (bookRequest.getPublicationDate() != null)
+                        book.setPublicationDate(bookRequest.getPublicationDate());
                     return bookRepository.save(book);
                 })
                 .orElseThrow(() -> new RuntimeException("Book not found"));
+    }
+
+
+    public void discontinueBook(Long id) {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Libro no encontrado con id: " + id));
+
+        // En lugar de: libroRepository.delete(libro);
+        // Hacemos Soft Delete:
+        book.softDelete();
+        bookRepository.save(book);
     }
 
 
@@ -95,7 +106,7 @@ public class BookServices {
                 book.getTitle(),
                 book.getAuthor(),
                 book.getIsbn(),
-                book.getPublicationYear()
+                book.getPublicationDate()
         );
     }
 }

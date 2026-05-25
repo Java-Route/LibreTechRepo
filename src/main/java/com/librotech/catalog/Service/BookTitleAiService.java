@@ -67,7 +67,7 @@ public class BookTitleAiService {
                     .append(" | Titulo: ").append(book.getTitle())
                     .append(" | Autor: ").append(book.getAuthor())
                     .append(" | ISBN: ").append(book.getIsbn() == null ? "N/A" : book.getIsbn())
-                    .append(" | Anio: ").append(book.getPublicationYear())
+                    .append(" | Fecha de publicacion: ").append(book.getPublicationDate())
                     .append(System.lineSeparator());
         }
         return catalog.toString();

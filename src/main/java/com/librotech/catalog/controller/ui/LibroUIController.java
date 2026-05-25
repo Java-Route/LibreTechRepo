@@ -3,7 +3,6 @@ package com.librotech.catalog.controller.ui;
 import com.librotech.catalog.Service.BookServices;
 import com.librotech.catalog.dto.BookRequest;
 import com.librotech.catalog.dto.BookResponse;
-import com.librotech.catalog.model.Book;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Controller
 @RequestMapping("/admin/books")
@@ -45,7 +43,7 @@ public class LibroUIController {
     @GetMapping("/new")
     public String mostrarFormularioCreacion(Model model) {
         // Pasamos una instancia vacía que el formulario llenará
-        model.addAttribute("book", new Book());
+        model.addAttribute("book", new BookRequest());
         model.addAttribute("screenTitle", "Registrar Nuevo Libro");
 
         return "books/form";
@@ -54,9 +52,9 @@ public class LibroUIController {
     @PostMapping("/save")
     public String guardarLibro(@ModelAttribute("book") BookRequest bookRequest, Model model) {
 
-        int currentYear = LocalDate.now().getYear();
-        if (bookRequest.getPublicationYear() > currentYear) {
-            model.addAttribute("yearError", "El año de publicación no puede ser mayor al año actual ("+currentYear +")");
+        LocalDate today = LocalDate.now();
+        if (bookRequest.getPublicationDate() != null && bookRequest.getPublicationDate().isAfter(today)) {
+            model.addAttribute("yearError", "La fecha de publicación no puede ser mayor a la fecha actual (" + today + ")");
             model.addAttribute("screenTitle", "Registrar Nuevo Libro (Corrección)");
 
             // Retornamos la vista del formulario (NO usamos redirect, para mantener los datos tipeados)

@@ -2,13 +2,15 @@ package com.librotech.catalog.dto;
 
 
 import com.librotech.catalog.validation.OnCreate;
-import com.librotech.catalog.validation.OnPatch;
 import com.librotech.catalog.validation.OnUpdate;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.aspectj.bridge.Message;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -24,5 +26,7 @@ public class BookRequest {
     @NotBlank(message = "isbn field is required", groups = {OnCreate.class , OnUpdate.class})
     private String isbn;
 
-    private Integer publicationYear;
+    @NotNull(message = "Publication date field is required", groups = {OnCreate.class, OnUpdate.class})
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate publicationDate;
 }

@@ -11,6 +11,8 @@ import java.util.Optional;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long> {
+    @Override
+    Optional<Book> findById(Long id);
 
     Page<Book> findByAuthorIgnoreCase(Pageable pageable, String author);
 
