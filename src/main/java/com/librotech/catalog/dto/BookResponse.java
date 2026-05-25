@@ -19,4 +19,8 @@ public class BookResponse {
     private String isbn;
 
     private LocalDate publicationDate;
+
+    private String editorialName;
+
+    private String genreName;
 }

@@ -2,7 +2,7 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${tituloPantalla}">Catálogo Estático</title>
+    <title th:text="${screenTitle}">Catálogo Estático</title>
     <!-- Estilos básicos embebidos para el laboratorio -->
     <style>
         body {
@@ -115,6 +115,7 @@
         <th>Autor</th>
         <th>ISBN</th>
         <th>Fecha</th>
+        <th>Editorial</th>
     </tr>
     </thead>
     <tbody>
@@ -125,6 +126,7 @@
         <td th:text="${libro.author}">Cervantes</td>
         <td th:text="${libro.isbn}">123-456</td>
         <td th:text="${libro.publicationDate}">1605-01-16</td>
+        <td th:text="${libro.editorialName}">Planeta</td>
     </tr>
     </tbody>
 </table>

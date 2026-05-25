@@ -17,12 +17,13 @@ import java.time.LocalDate;
 
 @Controller
 @RequestMapping("/admin/books")
-public class LibroUIController {
+public class BookUIController {
 
 
     private final BookServices bookServices;
 
-    public LibroUIController(BookServices bookServices) {
+
+    public BookUIController(BookServices bookServices) {
         this.bookServices = bookServices;
     }
 
@@ -44,6 +45,7 @@ public class LibroUIController {
     public String mostrarFormularioCreacion(Model model) {
         // Pasamos una instancia vacía que el formulario llenará
         model.addAttribute("book", new BookRequest());
+        model.addAttribute("editorials", bookServices.getAllEditorials());
         model.addAttribute("screenTitle", "Registrar Nuevo Libro");
 
         return "books/form";
@@ -55,11 +57,22 @@ public class LibroUIController {
         LocalDate today = LocalDate.now();
         if (bookRequest.getPublicationDate() != null && bookRequest.getPublicationDate().isAfter(today)) {
             model.addAttribute("yearError", "La fecha de publicación no puede ser mayor a la fecha actual (" + today + ")");
+            model.addAttribute("editorials", bookServices.getAllEditorials());
+
             model.addAttribute("screenTitle", "Registrar Nuevo Libro (Corrección)");
 
             // Retornamos la vista del formulario (NO usamos redirect, para mantener los datos tipeados)
             return "books/form";
         }
+
+        if (bookRequest.getEditorialId() == null) {
+            model.addAttribute("yearError", "Debe seleccionar una editorial");
+            model.addAttribute("editorials", bookServices.getAllEditorials());
+
+            model.addAttribute("screenTitle", "Registrar Nuevo Libro (Corrección)");
+            return "books/form";
+        }
+
         // Guardamos el libro usando el servicio
         bookServices.addBook(bookRequest);
 

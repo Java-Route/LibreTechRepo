@@ -2,7 +2,7 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${tituloPantalla}">Formulario</title>
+    <title th:text="${screenTitle}">Formulario</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -19,9 +19,10 @@
             font-weight: bold;
         }
 
-        input {
+        input,
+        select {
             padding: 8px;
-            width: 300px;
+            width: 320px;
         }
 
         button {
@@ -46,7 +47,7 @@
 <!-- th:replace="ruta/archivo :: nombreFragmento" -->
 <div th:replace="~{layout/components :: navbar}"></div>
 
-<h1 th:text="${tituloPantalla}">Nuevo Libro</h1>
+<h1 th:text="${screenTitle}">Nuevo Libro</h1>
 
 <!-- Bloque de error visual -->
 <div th:if="${yearError}" style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
@@ -75,6 +76,18 @@
     <div class="form-group">
         <label for="publicationDate">Fecha de Publicación:</label>
         <input type="date" th:field="*{publicationDate}" required/>
+    </div>
+
+    <div class="form-group">
+        <label for="editorialId">Editorial:</label>
+        <select th:field="*{editorialId}" required>
+            <option value="">Seleccione una editorial</option>
+            <option th:each="editorial : ${editorials}"
+                    th:value="${editorial.id}"
+                    th:text="${editorial.name}">
+                Editorial
+            </option>
+        </select>
     </div>
 
     <button type="submit">Guardar Libro</button>

@@ -17,16 +17,22 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class BookRequest {
 
-    @NotBlank(message = "Title field is required", groups = {OnCreate.class , OnUpdate.class})
+    @NotBlank(message = "Title field is required", groups = {OnCreate.class, OnUpdate.class})
     private String title;
 
-    @NotBlank(message = "Author field is required", groups = {OnCreate.class , OnUpdate.class})
+    @NotBlank(message = "Author field is required", groups = {OnCreate.class, OnUpdate.class})
     private String author;
 
-    @NotBlank(message = "isbn field is required", groups = {OnCreate.class , OnUpdate.class})
+    @NotBlank(message = "isbn field is required", groups = {OnCreate.class, OnUpdate.class})
     private String isbn;
 
     @NotNull(message = "Publication date field is required", groups = {OnCreate.class, OnUpdate.class})
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate publicationDate;
+
+    @NotNull(message = "Category field is required", groups = {OnCreate.class, OnUpdate.class})
+    private Long genreId;
+
+    @NotNull(message = "Editorial field is required", groups = {OnCreate.class, OnUpdate.class})
+    private Long editorialId;
 }
