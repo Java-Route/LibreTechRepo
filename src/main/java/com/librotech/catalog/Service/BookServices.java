@@ -4,11 +4,14 @@ import com.librotech.catalog.Repository.BookRepository;
 import com.librotech.catalog.Repository.EditorialRepository;
 import com.librotech.catalog.dto.BookRequest;
 import com.librotech.catalog.dto.BookResponse;
+import com.librotech.catalog.dto.BookResumeDTO;
 import com.librotech.catalog.model.Book;
 import com.librotech.catalog.model.Editorial;
 import com.librotech.catalog.model.Genre;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -127,6 +130,29 @@ public class BookServices {
         // Hacemos Soft Delete:
         book.softDelete();
         bookRepository.save(book);
+    }
+
+
+    private static final int DEFAULT_PAGE_SIZE = 10;
+
+    /**
+     * Obtiene un "slice" (fragmento) del catálogo de libros.
+     * No ejecuta COUNT → más rápido que Page para catálogos masivos.
+     *
+     * @param page número de página (0-indexed)
+     * @return Slice con los DTOs de resumen y metadatos de navegación
+     */
+    public Slice<BookResumeDTO> getCatalog(int page) {
+        Pageable pageable = PageRequest.of(page, DEFAULT_PAGE_SIZE);
+        return bookRepository.findAllResumeBooks(pageable);
+    }
+
+    /**
+     * Obtiene un libro con TODAS sus relaciones cargadas (para edición/detalle).
+     */
+    public Book getBookWithRelations(Long id) {
+        return bookRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Libro no encontrado: " + id));
     }
 
 
