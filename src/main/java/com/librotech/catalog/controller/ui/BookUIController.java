@@ -44,7 +44,7 @@ public class BookUIController {
     @GetMapping("/new")
     public String mostrarFormularioCreacion(Model model) {
         // Pasamos una instancia vacía que el formulario llenará
-        model.addAttribute("book", new BookRequest());
+        model.addAttribute("book", new BookRequest(null, null, null, null, null, null));
         model.addAttribute("editorials", bookServices.getAllEditorials());
         model.addAttribute("screenTitle", "Registrar Nuevo Libro");
 
@@ -55,7 +55,7 @@ public class BookUIController {
     public String guardarLibro(@ModelAttribute("book") BookRequest bookRequest, Model model) {
 
         LocalDate today = LocalDate.now();
-        if (bookRequest.getPublicationDate() != null && bookRequest.getPublicationDate().isAfter(today)) {
+        if (bookRequest.publicationDate() != null && bookRequest.publicationDate().isAfter(today)) {
             model.addAttribute("yearError", "La fecha de publicación no puede ser mayor a la fecha actual (" + today + ")");
             model.addAttribute("editorials", bookServices.getAllEditorials());
 
@@ -65,7 +65,7 @@ public class BookUIController {
             return "books/form";
         }
 
-        if (bookRequest.getEditorialId() == null) {
+        if (bookRequest.editorialId() == null) {
             model.addAttribute("yearError", "Debe seleccionar una editorial");
             model.addAttribute("editorials", bookServices.getAllEditorials());
 

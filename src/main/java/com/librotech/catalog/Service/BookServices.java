@@ -27,32 +27,35 @@ public class BookServices {
         this.bookTitleAiService = bookTitleAiService;
     }
 
-    @Transactional(readOnly = true)
+    //@Transactional(readOnly = true)
+    //Optimización de Rendimiento (Desactivación del Dirty Checking)(No lo hace): Hibernate realiza un seguimiento de todos los objetos que consultas para ver si sufrieron algún cambio antes de guardar
+    //Optimización a Nivel de Base de Datos:
+    //Prevención de Errores (Seguridad):
     public Page<BookResponse> getAllBooks(Pageable pageable) {
         return bookRepository.findAll(pageable)
                 .map(this::toBookResponse);
     }
 
-    @Transactional(readOnly = true)
+    //@Transactional(readOnly = true)
     public Page<BookResponse> getBookByAuthor(Pageable pageable, String author) {
         return bookRepository.findByAuthorIgnoreCase(pageable, author)
                 .map(this::toBookResponse);
     }
 
-    @Transactional(readOnly = true)
+    //@Transactional(readOnly = true)
     public List<Editorial> getAllEditorials() {
         return editorialRepository.findAll();
     }
 
     public BookResponse addBook(BookRequest request) {
-        Editorial editorial = editorialRepository.findById(request.getEditorialId())
+        Editorial editorial = editorialRepository.findById(request.editorialId())
                 .orElseThrow(() -> new RuntimeException("Editorial not found"));
 
         Book book = new Book();
-        book.setTitle(request.getTitle());
-        book.setAuthor(request.getAuthor());
-        book.setIsbn(request.getIsbn());
-        book.setPublicationDate(request.getPublicationDate());
+        book.setTitle(request.title());
+        book.setAuthor(request.author());
+        book.setIsbn(request.isbn());
+        book.setPublicationDate(request.publicationDate());
         book.setEditorial(editorial);
 
         Book savedBook = bookRepository.save(book);
@@ -60,7 +63,7 @@ public class BookServices {
         return toBookResponse(savedBook);
     }
 
-    @Transactional(readOnly = true)
+    //@Transactional(readOnly = true)
     public List<BookResponse> findBooksByDescription(String description) {
         List<Book> books = bookRepository.findAll();
         List<Long> matchingIds = bookTitleAiService.findBookIdsFromDescription(description, books);
@@ -84,12 +87,12 @@ public class BookServices {
     public void updateBook(Long id, BookRequest bookRequest) {
         bookRepository.findById(id)
                 .map(book -> {
-                            Editorial editorial = editorialRepository.findById(bookRequest.getEditorialId())
+                            Editorial editorial = editorialRepository.findById(bookRequest.editorialId())
                                     .orElseThrow(() -> new RuntimeException("Editorial not found"));
-                            book.setTitle(bookRequest.getTitle());
-                            book.setAuthor(bookRequest.getAuthor());
-                            book.setIsbn(bookRequest.getIsbn());
-                            book.setPublicationDate(bookRequest.getPublicationDate());
+                            book.setTitle(bookRequest.title());
+                            book.setAuthor(bookRequest.author());
+                            book.setIsbn(bookRequest.isbn());
+                            book.setPublicationDate(bookRequest.publicationDate());
                             book.setEditorial(editorial);
                             return bookRepository.save(book);
                         }
@@ -100,13 +103,13 @@ public class BookServices {
     public void patchBook(Long id, BookRequest bookRequest) {
         bookRepository.findById(id)
                 .map(book -> {
-                    if (bookRequest.getTitle() != null) book.setTitle(bookRequest.getTitle());
-                    if (bookRequest.getAuthor() != null) book.setAuthor(bookRequest.getAuthor());
-                    if (bookRequest.getIsbn() != null) book.setIsbn(bookRequest.getIsbn());
-                    if (bookRequest.getPublicationDate() != null)
-                        book.setPublicationDate(bookRequest.getPublicationDate());
-                    if (bookRequest.getEditorialId() != null) {
-                        Editorial editorial = editorialRepository.findById(bookRequest.getEditorialId())
+                    if (bookRequest.title() != null) book.setTitle(bookRequest.title());
+                    if (bookRequest.author() != null) book.setAuthor(bookRequest.author());
+                    if (bookRequest.isbn() != null) book.setIsbn(bookRequest.isbn());
+                    if (bookRequest.publicationDate() != null)
+                        book.setPublicationDate(bookRequest.publicationDate());
+                    if (bookRequest.editorialId() != null) {
+                        Editorial editorial = editorialRepository.findById(bookRequest.editorialId())
                                 .orElseThrow(() -> new RuntimeException("Editorial not found"));
                         book.setEditorial(editorial);
                     }

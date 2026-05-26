@@ -53,7 +53,7 @@ public class BookController {
 
     @PostMapping("/search-by-description")
     public ResponseEntity<List<BookResponse>> getBookFromDescription(@RequestBody @Valid BookDescriptionRequest request) {
-        List<BookResponse> books = bookServices.findBooksByDescription(request.getDescription());
+        List<BookResponse> books = bookServices.findBooksByDescription(request.description());
         return ResponseEntity.ok(books);
     }
 
