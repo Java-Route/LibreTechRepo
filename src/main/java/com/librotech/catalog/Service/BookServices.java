@@ -6,12 +6,14 @@ import com.librotech.catalog.dto.BookRequest;
 import com.librotech.catalog.dto.BookResponse;
 import com.librotech.catalog.model.Book;
 import com.librotech.catalog.model.Editorial;
+import com.librotech.catalog.model.Genre;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BookServices {
@@ -132,7 +134,9 @@ public class BookServices {
                 book.getAuthor(),
                 book.getIsbn(),
                 book.getPublicationDate(),
-                book.getEditorial().getName()
+                book.getEditorial().getName(),
+                book.getPrice(),
+                book.getGenres().stream().map(Genre::getName).collect(Collectors.toSet())
         );
     }
 }
