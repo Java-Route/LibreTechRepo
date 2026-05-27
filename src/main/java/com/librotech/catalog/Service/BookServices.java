@@ -150,9 +150,10 @@ public class BookServices {
     /**
      * Obtiene un libro con TODAS sus relaciones cargadas (para edición/detalle).
      */
-    public Book getBookWithRelations(Long id) {
-        return bookRepository.findById(id)
+    public BookResponse getBookWithRelations(Long id) {
+        Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Libro no encontrado: " + id));
+        return toBookResponse(book);
     }
 
 

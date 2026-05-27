@@ -4,6 +4,7 @@ import com.librotech.catalog.Service.BookServices;
 import com.librotech.catalog.dto.BookDescriptionRequest;
 import com.librotech.catalog.dto.BookRequest;
 import com.librotech.catalog.dto.BookResponse;
+import com.librotech.catalog.dto.BookResumeDTO;
 import com.librotech.catalog.validation.OnCreate;
 import com.librotech.catalog.validation.OnPatch;
 import com.librotech.catalog.validation.OnUpdate;
@@ -11,13 +12,16 @@ import jakarta.validation.Valid;
 import jakarta.websocket.server.PathParam;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/books")
@@ -29,20 +33,40 @@ public class BookController {
         this.bookServices = bookServices;
     }
 
+//    @GetMapping
+//    public ResponseEntity<Page<BookResponse>> getBooks(
+//            @RequestParam(required = false) String author,
+//            @PageableDefault(size = 10, sort = "title") Pageable pageable
+//    ) {
+//        Page<BookResponse> bookResponses;
+//
+//        if (author != null && !author.isBlank()) {
+//            bookResponses = bookServices.getBookByAuthor(pageable, author);
+//        } else {
+//            bookResponses = bookServices.getAllBooks(pageable);
+//        }
+//
+//        return ResponseEntity.ok(bookResponses);
+//    }
+    /**
+     * GET /api/libros?page=0
+     * Retorna un fragmento (Slice) del catálogo con metadatos de navegación.
+     */
     @GetMapping
-    public ResponseEntity<Page<BookResponse>> getBooks(
-            @RequestParam(required = false) String author,
-            @PageableDefault(size = 10, sort = "title") Pageable pageable
-    ) {
-        Page<BookResponse> bookResponses;
+    public ResponseEntity<Map<String, Object>> getCatalog(
+            @RequestParam(defaultValue = "0") int page) {
 
-        if (author != null && !author.isBlank()) {
-            bookResponses = bookServices.getBookByAuthor(pageable, author);
-        } else {
-            bookResponses = bookServices.getAllBooks(pageable);
-        }
+        Slice<BookResumeDTO> slice = bookServices.getCatalog(page);
 
-        return ResponseEntity.ok(bookResponses);
+        // Construimos una respuesta con metadatos de navegación
+        Map<String, Object> response = new HashMap<>();
+        response.put("books", slice.getContent());
+        response.put("currentPage", slice.getNumber());
+        response.put("pageSize", slice.getSize());
+        response.put("hasNext", slice.hasNext());
+        response.put("hasPrevious", slice.hasPrevious());
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
