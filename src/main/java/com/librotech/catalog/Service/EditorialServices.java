@@ -1,7 +1,10 @@
 package com.librotech.catalog.Service;
 
 import com.librotech.catalog.Repository.EditorialRepository;
+import com.librotech.catalog.dto.EditorialResponse;
 import com.librotech.catalog.model.Editorial;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 import java.util.List;
 
@@ -12,7 +15,7 @@ public class EditorialServices {
         this.editorialRepository = editorialRepository;
     }
 
-    public List<Editorial> getAllEditorials() {
-        return editorialRepository.findAll();
+    public Slice<EditorialResponse> getAllEditorials(Pageable pageable) {
+        return editorialRepository.findAll(pageable);
     }
 }
