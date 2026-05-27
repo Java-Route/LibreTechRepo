@@ -5,7 +5,7 @@ import java.time.LocalDate;
 public record BookResumeDTO(
         Long id,
         String title,
-        LocalDate publicationYear,
+        LocalDate publicationDate,
         Double price,
         String editorialName,
         String country

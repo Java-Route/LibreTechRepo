@@ -22,17 +22,17 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     Optional<Book> findFirstByTitleIgnoreCase(String title);
 
     @Query("""
-            SELECT new BookResumeDTO(
+            SELECT new com.librotech.catalog.dto.BookResumeDTO(
                 l.id,
                 l.title,
-                l.publicationYear,
+                l.publicationDate,
                 l.price,
-                l.editorial.nombre,
-                l.editorial.pais
+                l.editorial.name,
+                l.editorial.country
             )
-            FROM Libro l
+            FROM Book l
             JOIN l.editorial
-            ORDER BY l.publicationYear DESC
+            ORDER BY l.publicationDate DESC
             """)
     Slice<BookResumeDTO> findAllResumeBooks(Pageable pageable);
 
@@ -51,6 +51,6 @@ public interface BookRepository extends JpaRepository<Book, Long> {
      * Útil para el panel de administración donde se necesitan todos los datos.
      */
     @EntityGraph(attributePaths = {"editorial", "genres"})
-    @Query("SELECT l FROM Libro l ORDER BY l.fechaPublicacion DESC")
+    @Query("SELECT l FROM Book l ORDER BY l.publicationDate DESC")
     List<Book> findAllWithRelations();
 }
