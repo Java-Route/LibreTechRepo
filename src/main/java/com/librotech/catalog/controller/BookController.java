@@ -69,6 +69,12 @@ public class BookController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<BookResumeDTO> findById(@PathVariable Long id) {
+        BookResumeDTO book = bookServices.getBookWithRelations(id);
+        return ResponseEntity.ok(book);
+    }
+
     @PostMapping
     public ResponseEntity<BookResponse> createBook(@RequestBody @Validated(OnCreate.class) BookRequest request) {
         BookResponse bookCreated = bookServices.addBook(request);

@@ -43,6 +43,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
      * Sin @EntityGraph, acceder a libro.getEditorial() o libro.getGeneros()
      * dispararía consultas adicionales (N+1).
      */
+    @Override
     @EntityGraph(attributePaths = {"editorial", "genres"})
     Optional<Book> findById(Long id);
 

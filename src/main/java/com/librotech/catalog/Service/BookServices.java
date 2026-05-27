@@ -150,12 +150,15 @@ public class BookServices {
     /**
      * Obtiene un libro con TODAS sus relaciones cargadas (para edición/detalle).
      */
-    public BookResponse getBookWithRelations(Long id) {
+    public BookResumeDTO getBookWithRelations(Long id) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Libro no encontrado: " + id));
-        return toBookResponse(book);
+        return toBookResume(book);
     }
 
+    public List<Book> getBookWithRelationsResponse() {
+        return bookRepository.findAllWithRelations();
+    }
 
     private BookResponse toBookResponse(Book book) {
         return new BookResponse(
@@ -167,6 +170,17 @@ public class BookServices {
                 book.getEditorial().getName(),
                 book.getPrice(),
                 book.getGenres().stream().map(Genre::getName).collect(Collectors.toSet())
+        );
+    }
+
+    private BookResumeDTO toBookResume(Book book){
+        return new BookResumeDTO(
+                book.getId(),
+                book.getTitle(),
+                book.getPublicationDate(),
+                book.getPrice(),
+                book.getEditorial().getName(),
+                book.getEditorial().getCountry()
         );
     }
 }
