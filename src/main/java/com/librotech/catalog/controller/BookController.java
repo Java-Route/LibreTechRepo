@@ -54,9 +54,9 @@ public class BookController {
      */
     @GetMapping
     public ResponseEntity<Map<String, Object>> getCatalog(
-            @RequestParam(defaultValue = "0") int page) {
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
 
-        Slice<BookResumeDTO> slice = bookServices.getCatalog(page);
+        Slice<BookResumeDTO> slice = bookServices.getCatalog(page, size);
 
         // Construimos una respuesta con metadatos de navegación
         Map<String, Object> response = new HashMap<>();
@@ -67,6 +67,17 @@ public class BookController {
         response.put("hasPrevious", slice.hasPrevious());
 
         return ResponseEntity.ok(response);
+    }
+    @GetMapping("/country")
+    public ResponseEntity<Slice<BookResumeDTO>> getBooksByCountry(
+            @RequestParam String country, @PageableDefault(size = 10, sort = "title") Pageable pageable) {
+        Slice<BookResumeDTO> slice = bookServices.findByCountry(country, pageable);
+        return ResponseEntity.ok(slice);
+    }
+
+    @GetMapping("/test")
+    public ResponseEntity<List<BookResumeDTO>> getBooks() {
+        return ResponseEntity.ok(bookServices.getBookWithRelationsResponse());
     }
 
     @GetMapping("/{id}")

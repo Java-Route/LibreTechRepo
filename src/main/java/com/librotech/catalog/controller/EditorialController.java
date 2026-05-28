@@ -21,11 +21,11 @@ public class EditorialController {
         this.editorialServices = editorialServices;
     }
 
-    @GetMapping
-    public ResponseEntity<Map<String, Object>> getAllEditorials(
-            @PageableDefault(size = 10, sort = "name") Pageable pageable) {
-        Slice<EditorialResponse> editorials = editorialServices.getAllEditorials(pageable);
-        Map<String, Object> response = new HashMap<>();
-        return ResponseEntity.ok(response);
-    }
+//    @GetMapping
+//    public ResponseEntity<Map<String, Object>> getAllEditorials(
+//            @PageableDefault(size = 10, sort = "name") Pageable pageable) {
+//        Slice<EditorialResponse> editorials = editorialServices.getAllEditorials(pageable);
+//        Map<String, Object> response = new HashMap<>();
+//        return ResponseEntity.ok(response);
+//    }
 }

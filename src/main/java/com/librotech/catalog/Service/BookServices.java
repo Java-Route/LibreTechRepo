@@ -142,8 +142,26 @@ public class BookServices {
      * @param page número de página (0-indexed)
      * @return Slice con los DTOs de resumen y metadatos de navegación
      */
-    public Slice<BookResumeDTO> getCatalog(int page) {
-        Pageable pageable = PageRequest.of(page, DEFAULT_PAGE_SIZE);
+    public Slice<BookResumeDTO> getCatalog(int page, int size) {
+        if (size > 50){
+            size = 50;
+        }
+        Pageable pageable = PageRequest.of(page, size);
+        return bookRepository.findAllResumeBooks(pageable);
+    }
+
+    public Slice<BookResumeDTO> searchBook(String country,Long genreId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        // Solo país
+        if (country != null && !country.isBlank()) {
+            return bookRepository.findByCountry(country, pageable);
+        }
+
+        //solo genero
+        if (genreId != null) {
+            return bookRepository.findByGenreId(genreId, pageable);
+        }
+
         return bookRepository.findAllResumeBooks(pageable);
     }
 
@@ -156,8 +174,9 @@ public class BookServices {
         return toBookResume(book);
     }
 
-    public List<Book> getBookWithRelationsResponse() {
-        return bookRepository.findAllWithRelations();
+    public List<BookResumeDTO> getBookWithRelationsResponse() {
+        List<Book> books = bookRepository.findAllWithRelationsJPQL();
+        return books.stream().map(this::toBookResume).toList();
     }
 
     private BookResponse toBookResponse(Book book) {

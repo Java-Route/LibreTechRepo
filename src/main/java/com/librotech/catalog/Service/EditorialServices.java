@@ -5,9 +5,11 @@ import com.librotech.catalog.dto.EditorialResponse;
 import com.librotech.catalog.model.Editorial;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class EditorialServices {
     private final EditorialRepository editorialRepository;
 
@@ -15,7 +17,7 @@ public class EditorialServices {
         this.editorialRepository = editorialRepository;
     }
 
-    public Slice<EditorialResponse> getAllEditorials(Pageable pageable) {
-        return editorialRepository.findAll(pageable);
-    }
+//    public Slice<EditorialResponse> getAllEditorials(Pageable pageable) {
+//        return editorialRepository.findAll(pageable);
+//    }
 }
