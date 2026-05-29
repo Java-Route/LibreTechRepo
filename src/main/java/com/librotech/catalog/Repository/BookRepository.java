@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,16 +39,27 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             SELECT new com.librotech.catalog.dto.BookResumeDTO(
                         l.id, l.title, l.publicationDate, l.price, l.editorial.name, l.editorial.country
                         )
-                        FROM Book b JOIN b.genres g JOIN b.editorial e
+                        FROM Book l JOIN l.genres g JOIN l.editorial e
                                     WHERE g.id = :genreId
-                                                ORDER BY b.publicationDate DESC
+                                                ORDER BY l.publicationDate DESC
             """)
     Slice<BookResumeDTO> findByGenreId(@Param("genreId") Long genreId, Pageable pageable);
 
 
     // ===== BÚSQUEDA POR RANGO DE FECHAS DE PUBLICACIÓN =====
-
-    //
+    @Query("""
+        SELECT new com.librotech.catalog.dto.BookResumeDTO(
+            l.id, l.title, l.publicationDate, l.price, l.editorial.name, l.editorial.country
+        )
+        FROM Book l JOIN l.editorial
+        WHERE l.publicationDate BETWEEN :startDate AND :endDate
+        ORDER BY l.publicationDate DESC
+        """)
+    Slice<BookResumeDTO> findByPublicationDateBetween(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            Pageable pageable
+    );
     @Query("""
             SELECT new com.librotech.catalog.dto.BookResumeDTO(
                 l.id,
@@ -63,6 +75,26 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             """)
     Slice<BookResumeDTO> findAllResumeBooks(Pageable pageable);
 
+    // ===== BÚSQUEDA COMBINADA (país + género) =====
+    @Query("""
+            SELECT new com.librotech.catalog.dto.BookResumeDTO(
+               l.id,
+                    l.title,
+                    l.publicationDate,
+                    l.price,
+                    l.editorial.name,
+                    l.editorial.country
+            )
+            FROM Book l JOIN l.editorial e JOIN l.genres g
+            WHERE (:country IS NULL OR LOWER(e.country) LIKE LOWER(CONCAT('%', :country, '%')))
+            AND (:genreId IS NULL OR g.id = :genreId)
+            ORDER BY l.publicationDate DESC
+            """)
+    Slice<BookResumeDTO> searchBooks(
+            @Param("country") String country,
+            @Param("genreId") Long genreId,
+            Pageable pageable
+    );
     // ... dentro de la interfaz LibroRepository:
 
     /**

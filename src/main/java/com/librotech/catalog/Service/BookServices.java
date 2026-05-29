@@ -84,7 +84,9 @@ public class BookServices {
     public void deleteBook(Long id) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Book not found"));
-        bookRepository.delete(book);
+        //bookRepository.delete(book);
+        book.softDelete();
+        bookRepository.save(book);
     }
 
     public void updateBook(Long id, BookRequest bookRequest) {
@@ -152,6 +154,10 @@ public class BookServices {
 
     public Slice<BookResumeDTO> searchBook(String country,Long genreId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
+        // Si ambos filtros están presentes, búsqueda combinada
+        if (country != null && !country.isBlank() && genreId != null) {
+            return bookRepository.searchBooks(country, genreId, pageable);
+        }
         // Solo país
         if (country != null && !country.isBlank()) {
             return bookRepository.findByCountry(country, pageable);

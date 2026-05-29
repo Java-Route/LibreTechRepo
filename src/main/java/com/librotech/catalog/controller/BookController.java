@@ -8,6 +8,8 @@ import com.librotech.catalog.dto.BookResumeDTO;
 import com.librotech.catalog.validation.OnCreate;
 import com.librotech.catalog.validation.OnPatch;
 import com.librotech.catalog.validation.OnUpdate;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import jakarta.websocket.server.PathParam;
 import org.springframework.data.domain.Page;
@@ -52,27 +54,44 @@ public class BookController {
      * GET /api/libros?page=0
      * Retorna un fragmento (Slice) del catálogo con metadatos de navegación.
      */
+    @Operation(
+            summary = "Buscar libros con filtros opcionales",
+            description = """
+            Retorna un Slice paginado de libros en formato DTO liviano (LibroResumenDTO).
+            Los filtros son opcionales y combinables. Los resultados están ordenados por
+            fecha de publicación descendente. Los registros con borrado lógico (disponible=false)
+            son excluidos automáticamente por @SQLRestriction y NUNCA aparecen en los resultados.
+            """
+    )
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getCatalog(
-            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<Map<String, Object>> searchLibros(
+            @Parameter(description = "Filtro parcial por país de editorial (insensible a mayúsculas). Ej: 'esp' encuentra 'España'")
+            @RequestParam(required = false) String country,
 
-        Slice<BookResumeDTO> slice = bookServices.getCatalog(page, size);
+            @Parameter(description = "ID de género para filtrar. Ej: 1=Ficción, 2=No Ficción")
+            @RequestParam(required = false) Long genreId,
 
-        // Construimos una respuesta con metadatos de navegación
+            @Parameter(description = "Número de página (0-indexed)")
+            @RequestParam(defaultValue = "0") int page,
+
+            @Parameter(description = "Cantidad de libros por página")
+            @RequestParam(defaultValue = "10") int size
+
+    ) {
+
+        Slice<BookResumeDTO> slice = bookServices.searchBook(country, genreId, page, size);
+
         Map<String, Object> response = new HashMap<>();
         response.put("books", slice.getContent());
         response.put("currentPage", slice.getNumber());
-        response.put("pageSize", slice.getSize());
         response.put("hasNext", slice.hasNext());
         response.put("hasPrevious", slice.hasPrevious());
+        response.put("filters", Map.of(
+                "country", country != null ? country : "",
+                "genreId", genreId != null ? genreId : ""
+        ));
 
         return ResponseEntity.ok(response);
-    }
-    @GetMapping("/country")
-    public ResponseEntity<Slice<BookResumeDTO>> getBooksByCountry(
-            @RequestParam String country, @PageableDefault(size = 10, sort = "title") Pageable pageable) {
-        Slice<BookResumeDTO> slice = bookServices.findByCountry(country, pageable);
-        return ResponseEntity.ok(slice);
     }
 
     @GetMapping("/test")
@@ -98,6 +117,14 @@ public class BookController {
         return ResponseEntity.ok(books);
     }
 
+    @Operation(
+            summary = "Descatalogar libro (borrado lógico)",
+            description = """
+            Realiza un soft delete: marca el libro como disponible=false.
+            El registro permanece en la base de datos para trazabilidad,
+            pero desaparece de todas las consultas del catálogo.
+            """
+    )
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
         bookServices.deleteBook(id);
